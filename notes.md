@@ -275,3 +275,127 @@ async function findCourse() {
 }
 ```
 
+## update a document
+
+there is two approaches
+
+- Query first
+
+  - findById()
+  - Modify it's properties
+  - save()
+
+this method is flexible and allows you to apply whatever rule you want
+
+- Update first
+  - Update directly
+  - Optionally: get the updated document
+
+this method is good for rapid updating and must likely you know what are you doing
+
+```js
+async function updateCourse(id) {
+  const course = await Course.findById(id);
+  // there is two ways to update the course you just find
+
+  // one way
+
+  course.author = "new author";
+  course.tags = [...course.tags, "tag 1", "tag 2"];
+
+  // other way
+
+  course.set({
+    author: "new author",
+    tags: [...course.tags, "tag 1", "tag 2"],
+  });
+  const result = await course.save();
+  console.log(result);
+}
+```
+
+In Mongoose, the update method has been deprecated in favor of more specific update methods like updateOne, updateMany, and findOneAndUpdate. These methods provide more fine-grained control over the update process. Let's take a look at how the updateOne and findOneAndUpdate methods work to update a document:
+
+1. `updateOne` Method:
+
+   The updateOne method updates a single document that matches the provided filter criteria. It takes two main arguments:
+
+   - `Filter`: An object specifying the filter criteria to identify the document(s) you want to update.
+
+   - `Update`: An object specifying the fields and values you want to update in the matched document(s).
+
+Here's an example of how you might use updateOne:
+
+```js
+const filter = { _id: someDocumentId };
+const update = { $set: { firstName: "New First Name" } };
+
+User.updateOne(filter, update)
+  .then((result) => {
+    // Handle result
+  })
+  .catch((error) => {
+    // Handle error
+  });
+```
+
+2. findOneAndUpdate Method:
+
+   The findOneAndUpdate method updates a single document that matches the provided filter criteria and returns the updated document. It takes similar arguments to updateOne:
+
+   `Filter`: An object specifying the filter criteria.
+
+   `Update`: An object specifying the fields and values to update.
+
+Here's an example of how you might use findOneAndUpdate:
+
+```js
+const filter = { _id: someDocumentId };
+const update = { $set: { firstName: "New First Name" } };
+
+User.findOneAndUpdate(filter, update, { new: true })
+  .then((updatedDocument) => {
+    // Handle the updated document
+  })
+  .catch((error) => {
+    // Handle error
+  });
+```
+
+In the `findOneAndUpdate` example, note the use of the `{ new: true }` option. This option tells Mongoose to return the updated document after the update operation is performed. Without this option, the method would return the original document before the update.
+
+Both updateOne and findOneAndUpdate methods use the $set operator to specify the fields you want to update. Other operators are available to perform various update operations like incrementing values, removing fields, etc.
+
+Keep in mind that Mongoose also supports other update methods, like updateMany for updating multiple documents that match a filter, and each method provides various options to tailor the update behavior to your needs.
+
+## delete a document
+
+delete the matching document and without getting the removed document
+
+just return an acknowledge object saying `{acknowledge:true, deleteCount: 1 (the number of removed documents)}`
+
+```js
+async function deleteCourse(id) {
+  try {
+    const course = await Course.deleteOne({ _id: id });
+    console.log(course); // return an acknowledge object
+  } catch (err) {
+    console.log(err);
+  }
+}
+```
+
+delete the matching document and get the document back
+
+returns null if there is no document matching
+
+```js
+async function deleteCourse(id) {
+  try {
+    const course = await Course.findOneAndRemove({ _id: id });
+    console.log(course);
+  } catch (err) {
+    console.log(err);
+  }
+}
+```

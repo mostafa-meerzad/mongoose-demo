@@ -34,12 +34,55 @@ async function createCourse() {
 // createCourse()
 
 async function findCourse() {
-//   const courses = await Course.find({author:/Mosh/})
-  const courses = await Course.find({author:/^Mosh/})
-//   const courses = await Course.find({author:/hamedani$/})
+  //   const courses = await Course.find({author:/Mosh/})
+  const courses = await Course.find({ author: /^Mosh/ });
+  //   const courses = await Course.find({author:/hamedani$/})
   console.log(courses);
 }
 
-findCourse();
+// findCourse();
+
+async function updateCourse(id) {
+  try {
+    // update using find method
+
+    // const course = await Course.findOne({_id: id});
+    // course.author = "Kyle Cook";
+    // course.isPublished = true;
+    // const result = await course.save()
+    // console.log(result)
+    //----------------------------------
+    // update using update method
+
+    const course = await Course.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: { author: "Mosh" },
+      },
+      { new: true }
+    );
+    console.log(course);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+// updateCourse("64f0828a514ed4bd09a3e027");
 
 
+async function deleteCourse(id){
+
+    try {
+        // const course = await Course.deleteOne({_id:id})
+        // console.log(course)// return an acknowledge object
+
+        // delete a document and get the deleted document 
+        const course = await Course.findOneAndRemove({_id:id})
+        // returns null if there is no document matching 
+        console.log(course)
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
+deleteCourse("64f08292f68ddf968a887c08");
